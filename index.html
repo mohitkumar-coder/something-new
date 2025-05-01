@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Om Sai Travels - Login/Register</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #007bff, #00c6ff);
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    input[type="submit"], button {
+      background: #00c6ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    input[type="submit"]:hover, button:hover {
+      background: #007bff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .car {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+      transition: 0.3s ease-in-out;
+    }
+
+    .car:hover {
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+      transform: scale(1.01);
+    }
+
+    .car img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .car h3 {
+      margin-top: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 5px;
+      display: none;
+      font-size: 14px;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      display: block;
+      animation: fadeOut 4s forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome to Om Sai Travels</h1>
+
+  <!-- Login -->
+  <div class="box" id="loginBox">
+    <h2>Login</h2>
+    <form onsubmit="return handleLogin(event)">
+      <input type="text" id="loginUser" placeholder="Username" required>
+      <input type="password" id="loginPass" placeholder="Password" required>
+      <input type="submit" value="Login">
+    </form>
+    <a href="#" onclick="showRegister()">Don't have an account? Register</a>
+  </div>
+
+  <!-- Register -->
+  <div class="box hidden" id="registerBox">
+    <h2>Register</h2>
+    <form onsubmit="return handleRegister(event)">
+      <input type="text" id="regUser" placeholder="Create Username" required>
+      <input type="password" id="regPass" placeholder="Create Password" required>
+      <input type="submit" value="Register">
+    </form>
+    <a href="#" onclick="showLogin()">Back to Login</a>
+  </div>
+
+  <!-- Car Listings -->
+  <div id="carSection" class="hidden">
+    <!-- Scorpio -->
+    <div class="car">
+      <img src="https://imgd.aeplcdn.com/600x337/n/cw/ec/140301/scorpio-classic-exterior-right-front-three-quarter-2.jpeg" alt="Scorpio">
+      <h3>Mahindra Scorpio Variant S5</h3>
+      <p>Powerful 2.2L mHawk engine, 7-seater, manual transmission. Perfect for long and tough drives.</p>
+      <form onsubmit="return bookNow(event, 'scorpio')">
+        <label>Your Name:</label>
+        <input type="text" required id="name-scorpio">
+        <label>Date:</label>
+        <input type="date" required id="date-scorpio">
+        <label>From:</label>
+        <input type="text" required id="from-scorpio">
+        <label>To:</label>
+        <input type="text" required id="to-scorpio">
+        <button type="submit">Book Now</button>
+      </form>
+    </div>
+
+    <!-- Brezza -->
+    <div class="car">
+      <img src="https://imgd.aeplcdn.com/600x337/n/cw/ec/139321/vitara-brezza-exterior-right-front-three-quarter-2.jpeg" alt="Brezza">
+      <h3>Maruti Suzuki Vitara Brezza</h3>
+      <p>Smart 1.5L petrol SUV, 5-seater with great mileage and city comfort. Stylish and efficient.</p>
+      <form onsubmit="return bookNow(event, 'brezza')">
+        <label>Your Name:</label>
+        <input type="text" required id="name-brezza">
+        <label>Date:</label>
+        <input type="date" required id="date-brezza">
+        <label>From:</label>
+        <input type="text" required id="from-brezza">
+        <label>To:</label>
+        <input type="text" required id="to-brezza">
+        <button type="submit">Book Now</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Booking message sent to the owner via WhatsApp!</div>
+
+  <script>
+    let savedUsername = "";
+    let savedPassword = "";
+
+    function showRegister() {
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("registerBox").classList.remove("hidden");
+    }
+
+    function showLogin() {
+      document.getElementById("registerBox").classList.add("hidden");
+      document.getElementById("loginBox").classList.remove("hidden");
+    }
+
+    function handleRegister(event) {
+      event.preventDefault();
+      savedUsername = document.getElementById("regUser").value;
+      savedPassword = document.getElementById("regPass").value;
+      alert("Registered successfully! Please login.");
+      showLogin();
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const user = document.getElementById("loginUser").value;
+      const pass = document.getElementById("loginPass").value;
+      if (user === savedUsername && pass === savedPassword) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("carSection").classList.remove("hidden");
+      } else {
+        alert("Incorrect login.");
+      }
+    }
+
+    function bookNow(event, car) {
+      event.preventDefault();
+      const name = document.getElementById(`name-${car}`).value;
+      const date = document.getElementById(`date-${car}`).value;
+      const from = document.getElementById(`from-${car}`).value;
+      const to = document.getElementById(`to-${car}`).value;
+
+      const message = `Hi, I am ${name}. I want to book your car (${car.toUpperCase()}) on ${date} from ${from} to ${to}.`;
+      const phone = '919939287115';
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      
+      window.open(url, '_blank');
+      showToast();
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>
